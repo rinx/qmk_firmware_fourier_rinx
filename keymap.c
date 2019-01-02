@@ -282,6 +282,7 @@ void render_status(struct CharacterMatrix *matrix) {
   snprintf(buf,sizeof(buf), "Und-%ld", layer_state);
 
   uint8_t layer = biton32(layer_state);
+  uint8_t default_layer = biton32(default_layer_state);
   matrix_write_P(matrix, PSTR("LAYER:"));
     switch (layer) {
         case _QWERTY:
@@ -327,11 +328,18 @@ void render_status(struct CharacterMatrix *matrix) {
   matrix_write_P(matrix, PSTR("\nMODE:"));
     switch (layer) {
         case _QWERTY:
-            matrix_write_P(matrix, PSTR("Linux/Windows"));
+            switch (default_layer) {
+                case _QWERTY:
+                    matrix_write_P(matrix, PSTR("Linux/Windows"));
+                    break;
+                case _MQWERTY:
+                    matrix_write_P(matrix, PSTR("MacOS"));
+                    break;
+            }
             break;
-        case _MQWERTY:
-            matrix_write_P(matrix, PSTR("MacOS"));
-            break;
+        // case _MQWERTY:
+        //     matrix_write_P(matrix, PSTR("MacOS"));
+        //     break;
         case _LOWER:
             matrix_write_P(matrix, PSTR("Linux/Windows"));
             break;
