@@ -1,2 +1,4 @@
+SRC += ssd1306.c
+
 RGBLIGHT_ENABLE = no
 MOUSEKEY_ENABLE = no

@@ -1,21 +1,25 @@
 #include QMK_KEYBOARD_H
+#include "LUFA/Drivers/Peripheral/TWI.h"
+#ifdef SSD1306OLED
+  #include "ssd1306.h"
+#endif
 
-// Each layer gets a name for readability, which is then used in the keymap matrix below.
-// The underscores don't mean anything - you can have a layer called STUFF or any other name.
-// Layer names don't all need to be of the same length, obviously, and you can also skip them
-// entirely and just use numbers.
-#define _QWERTY 0
-#define _MQWERTY 1
-#define _LOWER 2
-#define _MLOWER 3
-#define _RAISE 4
-#define _MRAISE 5
-#define _FUNCT 6
-#define _MFUNCT 7
-#define _ARROW 8
-#define _MARROW 9
-#define _ADMINI 10
-#define _MADMINI 11
+extern keymap_config_t keymap_config;
+
+enum layer_number {
+    _QWERTY = 0,
+    _MQWERTY,
+    _LOWER,
+    _MLOWER,
+    _RAISE,
+    _MRAISE,
+    _FUNCT,
+    _MFUNCT,
+    _ARROW,
+    _MARROW,
+    _ADMINI,
+    _MADMINI,
+};
 
 #define _______ KC_TRNS
 #define XXXXXXX KC_NO
@@ -91,7 +95,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * ,-----------------------------------------------------------------------------------.
  * |   ~  |   !  |   @  |   #  |   $  |   %  |   ^  |   &  |   *  |   (  |   )  | Bksp |
  * |------+------+------+------+------+-------------+------+------+------+------+------|
- * |      |      |      |      | FIND |      |      |   _  |   +  |   {  |   }  |   '  |
+ * |      |      |      |      | FIND |      |      |   _  |   +  |   {  |   }  |   "  |
  * |------+------+------+------+------+-------------+------+------+------+------+------|
  * |      | UNDO | CUT  | COPY | PASTE|      |      |      |      |      |XXXXXX|      |
  * |------+------+------+------+------+-------------+------+------+------+------+------|
@@ -100,13 +104,13 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  */
   [_LOWER] = LAYOUT(
     KC_TILD, KC_EXLM, KC_AT,   KC_HASH, KC_DLR,  KC_PERC, KC_CIRC, KC_AMPR, KC_ASTR, KC_LPRN, KC_RPRN, XXXXXXX, KC_BSPC,
-    _______, _______, _______, _______, WINFIND, _______, _______, KC_UNDS, KC_PLUS, KC_LCBR, KC_RCBR,          KC_QUOT,
+    _______, _______, _______, _______, WINFIND, _______, _______, KC_UNDS, KC_PLUS, KC_LCBR, KC_RCBR,          KC_DQUO,
     _______, WINUNDO, WINCUT, WINCOPY, WINPASTE, _______, _______,          _______, _______, _______, _______, _______,
     _______, _______, _______, XXXXXXX, _______,          _______,                   _______, _______, _______, _______
   ),
   [_MLOWER] = LAYOUT(
     KC_TILD, KC_EXLM, KC_AT,   KC_HASH, KC_DLR,  KC_PERC, KC_CIRC, KC_AMPR, KC_ASTR, KC_LPRN, KC_RPRN, XXXXXXX, KC_BSPC,
-    _______, _______, _______, _______, MACFIND, _______, _______, KC_UNDS, KC_PLUS, KC_LCBR, KC_RCBR,          KC_QUOT,
+    _______, _______, _______, _______, MACFIND, _______, _______, KC_UNDS, KC_PLUS, KC_LCBR, KC_RCBR,          KC_DQUO,
     _______, MACUNDO, MACCUT, MACCOPY, MACPASTE, _______, _______,          _______, _______, _______, _______, _______,
     _______, _______, _______, XXXXXXX, _______,          _______,                   _______, _______, _______, _______
   ),
@@ -139,7 +143,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * ,-----------------------------------------------------------------------------------.
  * |  F1  |  F2  |  F3  |  F4  |  F5  |  F6  |  F7  |  F8  |  F9  |  F10 |  F11 |  F12 |
  * |------+------+------+------+------+-------------+------+------+------+------+------|
- * |      |      |      |      |      |      |      |      |      |      |      |      |
+ * | CAPS |NUMLCK|SCLLCK|      |      |      |      |      |      |      |      |      |
  * |------+------+------+------+------+-------------+------+------+------+------+------|
  * |      |      |      |      |      |      |      |      |      |      |      |      |
  * |------+------+------+------+------+-------------+------+------+------+------+------|
@@ -148,13 +152,13 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  */
   [_FUNCT] = LAYOUT(
     KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,   KC_F7,   KC_F8,   KC_F9,   KC_F10,   KC_F11, XXXXXXX, KC_F12,
-    _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,          _______,
+    KC_CAPS, KC_NLCK, KC_SLCK, _______, _______, _______, _______, _______, _______, _______, _______,          _______,
     _______, _______, _______, _______, _______, _______, _______,          _______, _______, _______, _______, _______,
     ADMINI, _______, _______, XXXXXXX, _______,          _______,                   _______, _______, _______, _______
   ),
   [_MFUNCT] = LAYOUT(
     KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,   KC_F7,   KC_F8,   KC_F9,   KC_F10,   KC_F11, XXXXXXX, KC_F12,
-    _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,          _______,
+    KC_CAPS, KC_NLCK, KC_SLCK, _______, _______, _______, _______, _______, _______, _______, _______,          _______,
     _______, _______, _______, _______, _______, _______, _______,          _______, _______, _______, _______, _______,
     MADMINI, _______, _______, XXXXXXX, _______,          _______,                   _______, _______, _______, _______
   ),
@@ -243,11 +247,142 @@ const macro_t *action_get_macro(keyrecord_t *record, uint8_t id, uint8_t opt)
     return MACRO_NONE;
 };
 
-void matrix_init_user(void) {
+
+//SSD1306 OLED update loop, make sure to add #define SSD1306OLED in config.h
+#ifdef SSD1306OLED
+void matrix_master_OLED_init(void) {
+    TWI_Init(TWI_BIT_PRESCALE_1, TWI_BITLENGTH_FROM_FREQ(1, 800000));
+    iota_gfx_init();   // turns on the display
 };
 
 void matrix_scan_user(void) {
-};
+    iota_gfx_task();  // this is what updates the display continuously
+}
+
+void matrix_update(struct CharacterMatrix *dest,
+                          const struct CharacterMatrix *source) {
+  if (memcmp(dest->display, source->display, sizeof(dest->display))) {
+    memcpy(dest->display, source->display, sizeof(dest->display));
+    dest->dirty = true;
+  }
+}
+
+void render_status(struct CharacterMatrix *matrix) {
+
+  // static char logo[]={
+  //   0x80,0x81,0x82,0x83,0x84,0x85,0x86,0x87,0x88,0x89,0x8a,0x8b,0x8c,0x8d,0x8e,0x8f,0x90,0x91,0x92,0x93,0x94,
+  //   0xa0,0xa1,0xa2,0xa3,0xa4,0xa5,0xa6,0xa7,0xa8,0xa9,0xaa,0xab,0xac,0xad,0xae,0xaf,0xb0,0xb1,0xb2,0xb3,0xb4,
+  //   0xc0,0xc1,0xc2,0xc3,0xc4,0xc5,0xc6,0xc7,0xc8,0xc9,0xca,0xcb,0xcc,0xcd,0xce,0xcf,0xd0,0xd1,0xd2,0xd3,0xd4,
+  //   0};
+  // matrix_write(matrix, logo);
+
+  matrix_write_P(matrix, PSTR("Fourier Keyboard\n\n"));
+
+  char buf[40];
+  snprintf(buf,sizeof(buf), "Und-%ld", layer_state);
+
+  uint8_t layer = biton32(layer_state);
+  matrix_write_P(matrix, PSTR("LAYER:"));
+    switch (layer) {
+        case _QWERTY:
+            matrix_write_P(matrix, PSTR("QWERTY"));
+            break;
+        case _MQWERTY:
+            matrix_write_P(matrix, PSTR("QWERTY"));
+            break;
+        case _LOWER:
+            matrix_write_P(matrix, PSTR("Lower "));
+            break;
+        case _MLOWER:
+            matrix_write_P(matrix, PSTR("Lower "));
+            break;
+        case _RAISE:
+            matrix_write_P(matrix, PSTR("Raise "));
+            break;
+        case _MRAISE:
+            matrix_write_P(matrix, PSTR("Raise "));
+            break;
+        case _FUNCT:
+            matrix_write_P(matrix, PSTR("Funct."));
+            break;
+        case _MFUNCT:
+            matrix_write_P(matrix, PSTR("Funct."));
+            break;
+        case _ARROW:
+            matrix_write_P(matrix, PSTR("Arrow "));
+            break;
+        case _MARROW:
+            matrix_write_P(matrix, PSTR("Arrow "));
+            break;
+        case _ADMINI:
+            matrix_write_P(matrix, PSTR("Admin."));
+            break;
+        case _MADMINI:
+            matrix_write_P(matrix, PSTR("Admin."));
+            break;
+        default:
+            matrix_write(matrix, buf);
+            break;
+    }
+  matrix_write_P(matrix, PSTR("\nMODE:"));
+    switch (layer) {
+        case _QWERTY:
+            matrix_write_P(matrix, PSTR("Linux/Windows"));
+            break;
+        case _MQWERTY:
+            matrix_write_P(matrix, PSTR("MacOS"));
+            break;
+        case _LOWER:
+            matrix_write_P(matrix, PSTR("Linux/Windows"));
+            break;
+        case _MLOWER:
+            matrix_write_P(matrix, PSTR("MacOS"));
+            break;
+        case _RAISE:
+            matrix_write_P(matrix, PSTR("Linux/Windows"));
+            break;
+        case _MRAISE:
+            matrix_write_P(matrix, PSTR("MacOS"));
+            break;
+        case _FUNCT:
+            matrix_write_P(matrix, PSTR("Linux/Windows"));
+            break;
+        case _MFUNCT:
+            matrix_write_P(matrix, PSTR("MacOS"));
+            break;
+        case _MARROW:
+            matrix_write_P(matrix, PSTR("MacOS"));
+            break;
+        case _ARROW:
+            matrix_write_P(matrix, PSTR("Linux/Windows"));
+            break;
+        case _ADMINI:
+            matrix_write_P(matrix, PSTR("Linux/Windows"));
+            break;
+        case _MADMINI:
+            matrix_write_P(matrix, PSTR("MacOS"));
+            break;
+        default:
+            matrix_write(matrix, buf);
+            break;
+    }
+}
+
+void iota_gfx_task_user(void) {
+  struct CharacterMatrix matrix;
+
+#if DEBUG_TO_SCREEN
+  if (debug_enable) {
+    return;
+  }
+#endif
+
+  matrix_clear(&matrix);
+  render_status(&matrix);
+  matrix_update(&display, &matrix);
+}
+
+#endif
 
 void persistant_default_layer_set(uint16_t default_layer) {
   eeconfig_update_default_layer(default_layer);
